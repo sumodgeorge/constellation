@@ -166,7 +166,7 @@ runs:
 
     - name: Create IAM configuration
       id: constellation-iam-create
-      if: inputs.test == 'iamcreate' && inputs.cloudProvider != 'azure' # skip for Azure, as the SP / MI does not have the required permissions
+      if: inputs.test == 'iamcreate'
       uses: ./.github/actions/constellation_iam_create
       with:
         cloudProvider: ${{ inputs.cloudProvider }}
