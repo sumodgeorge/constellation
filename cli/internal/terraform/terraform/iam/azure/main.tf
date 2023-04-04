@@ -13,7 +13,13 @@ terraform {
 
 # Configure Azure resource management provider
 provider "azurerm" {
-  features {}
+  features {
+    resource_group {
+      # Temporary fix for smart detection rule creation
+      # Remove once https://github.com/hashicorp/terraform-provider-azurerm/issues/18026 is fixed
+      prevent_deletion_if_contains_resources = false
+    }
+  }
 }
 
 # Configure Azure active directory provider
