@@ -70,11 +70,11 @@ func main() {
 
 	ctx, cancel := context.WithTimeout(context.Background(), vpcIPTimeout)
 	defer cancel()
-	vpcIP, err := getVPCIP(ctx, *provider)
+	lbEndpoint, err := getLoadBalancerEndpoint(ctx, *provider)
 	if err != nil {
 		log.With(zap.Error(err)).Fatalf("Failed to get IP in VPC")
 	}
-	apiServerEndpoint := net.JoinHostPort(vpcIP, strconv.Itoa(constants.KubernetesPort))
+	apiServerEndpoint := net.JoinHostPort(lbEndpoint, strconv.Itoa(constants.KubernetesPort))
 	kubeadm, err := kubeadm.New(apiServerEndpoint, log.Named("kubeadm"))
 	if err != nil {
 		log.With(zap.Error(err)).Fatalf("Failed to create kubeadm")
@@ -115,7 +115,7 @@ func main() {
 	}
 }
 
-func getVPCIP(ctx context.Context, provider string) (string, error) {
+func getLoadBalancerEndpoint(ctx context.Context, provider string) (string, error) {
 	var metadataClient metadataAPI
 	var err error
 
@@ -148,13 +148,14 @@ func getVPCIP(ctx context.Context, provider string) (string, error) {
 		return "", errors.New("unsupported cloud provider")
 	}
 
-	self, err := metadataClient.Self(ctx)
+	host, _, err := metadataClient.GetLoadBalancerEndpoint(ctx)
 	if err != nil {
 		return "", err
 	}
-	return self.VPCIP, nil
+	return host, nil
 }
 
 type metadataAPI interface {
 	Self(ctx context.Context) (metadata.InstanceMetadata, error)
+	GetLoadBalancerEndpoint(ctx context.Context) (host, port string, err error)
 }
