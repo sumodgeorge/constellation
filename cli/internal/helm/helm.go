@@ -121,6 +121,9 @@ type ChartApplyExecutor struct {
 
 // Apply applies the charts in order.
 func (c ChartApplyExecutor) Apply(ctx context.Context) error {
+	fmt.Println("Waiting Applying charts")
+	// time.Sleep(60 * time.Second)
+	fmt.Println("Doing Applying charts")
 	for _, action := range c.actions {
 		c.log.Debugf("Applying %q", action.ReleaseName())
 		if err := action.Apply(ctx); err != nil {
