@@ -151,7 +151,7 @@ func (i *chartLoader) loadReleases(conformanceMode bool, helmWaitMode WaitMode, 
 	}
 	conServicesRelease.Values = mergeMaps(conServicesRelease.Values, svcVals)
 
-	releases := releaseApplyOrder{ciliumRelease, conServicesRelease, certManagerRelease} //
+	releases := releaseApplyOrder{conServicesRelease, certManagerRelease} // ciliumRelease
 	if i.config.DeployCSIDriver() {
 		csiRelease, err := i.loadRelease(csiInfo, helmWaitMode)
 		if err != nil {

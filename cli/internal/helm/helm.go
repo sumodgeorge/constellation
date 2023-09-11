@@ -31,6 +31,7 @@ package helm
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/edgelesssys/constellation/v2/cli/internal/clusterid"
 	"github.com/edgelesssys/constellation/v2/cli/internal/terraform"
@@ -122,7 +123,7 @@ type ChartApplyExecutor struct {
 // Apply applies the charts in order.
 func (c ChartApplyExecutor) Apply(ctx context.Context) error {
 	fmt.Println("Waiting Applying charts")
-	// time.Sleep(60 * time.Second)
+	time.Sleep(60 * time.Second)
 	fmt.Println("Doing Applying charts")
 	for _, action := range c.actions {
 		c.log.Debugf("Applying %q", action.ReleaseName())
