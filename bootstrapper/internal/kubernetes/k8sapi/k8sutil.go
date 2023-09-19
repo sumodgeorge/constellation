@@ -280,38 +280,6 @@ func (k *KubernetesUtil) WaitForCilium(ctx context.Context, log *logger.Logger) 
 // FixCilium fixes https://github.com/cilium/cilium/issues/19958
 // Instead of a rollout restart of the Cilium DaemonSet, it only restarts the local Cilium Pod.
 func (k *KubernetesUtil) FixCilium(ctx context.Context) error {
-	// get cilium container id
-	out, err := exec.CommandContext(ctx, "/run/state/bin/crictl", "ps", "--name", "cilium-agent", "-q").CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("getting cilium container id failed: %s", out)
-	}
-	outLines := strings.Split(string(out), "\n")
-	if len(outLines) < 2 {
-		return fmt.Errorf("getting cilium container id returned invalid output: %s", out)
-	}
-	containerID := outLines[len(outLines)-2]
-
-	// get cilium pod id
-	out, err = exec.CommandContext(ctx, "/run/state/bin/crictl", "inspect", "-o", "go-template", "--template", "{{ .info.sandboxID }}", containerID).CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("getting Cilium Pod ID failed: %s", out)
-	}
-	outLines = strings.Split(string(out), "\n")
-	if len(outLines) < 2 {
-		return fmt.Errorf("getting Cilium Pod ID returned invalid output: %s", out)
-	}
-	podID := outLines[len(outLines)-2]
-
-	// stop and delete pod
-	out, err = exec.CommandContext(ctx, "/run/state/bin/crictl", "stopp", podID).CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("stopping Cilium agent Pod failed: %s", out)
-	}
-	out, err = exec.CommandContext(ctx, "/run/state/bin/crictl", "rmp", podID).CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("removing Cilium agent Pod failed: %s", out)
-	}
-
 	return nil
 }
 
