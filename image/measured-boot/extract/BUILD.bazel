@@ -1,0 +1,9 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "extract",
+    srcs = ["extract.go"],
+    importpath = "github.com/edgelesssys/constellation/v2/image/measured-boot/extract",
+    visibility = ["//visibility:public"],
+    deps = ["//image/measured-boot/pesection"],
+)

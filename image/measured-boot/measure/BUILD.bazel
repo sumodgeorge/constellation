@@ -1,0 +1,19 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "measure",
+    srcs = [
+        "authentihash.go",
+        "pcr.go",
+        "pcr04.go",
+        "pcr09.go",
+        "pcr11.go",
+    ],
+    importpath = "github.com/edgelesssys/constellation/v2/image/measured-boot/measure",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//image/measured-boot/pesection",
+        "@com_github_foxboron_go_uefi//efi/pecoff",
+        "@org_golang_x_text//encoding/unicode",
+    ],
+)
