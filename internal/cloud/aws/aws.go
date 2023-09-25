@@ -154,11 +154,21 @@ func (c *Cloud) GetLoadBalancerEndpoint(ctx context.Context) (host, port string,
 	}
 	// fallback to old architecture
 	// this will be removed in the future
+	var errs error
 	hostname, err := c.getLoadBalancerIPOldInfrastructure(ctx)
-	if err != nil {
-		return "", "", fmt.Errorf("retrieving load balancer ip: %w", err)
+	if err == nil {
+		return hostname, strconv.FormatInt(constants.KubernetesPort, 10), nil
 	}
-	return hostname, strconv.FormatInt(constants.KubernetesPort, 10), nil
+	errs = errors.Join(errs, fmt.Errorf("retrieving load balancer ip from old infrastructure: %w", err))
+
+	// for internal LBs we will not find any IPAdresses above so we can return the DNS name here
+	hostname, err = c.getLoadBalancerDNSName(ctx)
+	if err == nil {
+		return hostname, strconv.FormatInt(constants.KubernetesPort, 10), nil
+	}
+	errs = errors.Join(errs, fmt.Errorf("retrieving load balancer dns name: %w", err))
+
+	return "", "", errs
 }
 
 // getLoadBalancerIPOldInfrastructure returns the IP of the load balancer.
@@ -187,7 +197,6 @@ func (c *Cloud) getLoadBalancerIPOldInfrastructure(ctx context.Context) (string,
 	return *loadbalancer.AvailabilityZones[0].LoadBalancerAddresses[0].IpAddress, nil
 }
 
-/*
 // TODO(malt3): uncomment and use as soon as we switch the primary endpoint to DNS.
 func (c *Cloud) getLoadBalancerDNSName(ctx context.Context) (string, error) {
 	loadbalancer, err := c.getLoadBalancer(ctx)
@@ -199,7 +208,6 @@ func (c *Cloud) getLoadBalancerDNSName(ctx context.Context) (string, error) {
 	}
 	return *loadbalancer.DNSName, nil
 }
-*/
 
 func (c *Cloud) getLoadBalancer(ctx context.Context) (*elasticloadbalancingv2types.LoadBalancer, error) {
 	uid, err := c.readInstanceTag(ctx, cloud.TagUID)
