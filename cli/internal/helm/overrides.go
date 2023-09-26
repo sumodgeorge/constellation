@@ -62,7 +62,7 @@ func extraConstellationServicesValues(
 	}
 	extraVals["verification-service"] = map[string]any{
 		"attestationVariant": cfg.GetAttestationConfig().GetVariant().String(),
-		"loadBalancerIP":     output.ClusterEndpoint,
+		"loadBalancerIP":     "172.0.0.1",
 	}
 	extraVals["konnectivity"] = map[string]any{
 		"loadBalancerIP": output.ClusterEndpoint,
